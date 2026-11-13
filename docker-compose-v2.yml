@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: elastic/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    ports:
+      - '9200:9200'
+    networks:
+      - elk-net
+
+  logstash:
+    image: elastic/logstash:8.11.0
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline/logstash-security.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - '5044:5044'
+    environment:
+      LS_JAVA_OPTS: '-Xms512m -Xmx512m'
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-net
+
+  kibana:
+    image: elastic/kibana:8.11.0
+    container_name: kibana
+    ports:
+      - '5601:5601'
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-net
+
+  filebeat:
+    image: elastic/filebeat:8.11.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/app_logs:ro
+    depends_on:
+      - logstash
+    networks:
+      - elk-net
+
+networks:
+  elk-net:
+    driver: bridge
