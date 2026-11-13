@@ -1,0 +1,21 @@
+filebeat.inputs:
+- type: filestream
+  id: auth-logs-stream
+  enabled: true
+  paths:
+    - /var/log/app_logs/auth.log
+  fields:
+    log_type: authentication
+  fields_under_root: true
+
+- type: filestream
+  id: nginx-logs-stream
+  enabled: true
+  paths:
+    - /var/log/app_logs/nginx_access.log
+  fields:
+    log_type: nginx_access
+  fields_under_root: true
+
+output.logstash:
+  hosts: ["logstash:5044"]

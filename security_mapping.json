@@ -1,0 +1,32 @@
+{
+  "index_patterns": ["security-logs-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.refresh_interval": "5s"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "log_type": { "type": "keyword" },
+        "src_ip": { "type": "ip" },
+        "client_ip": { "type": "ip" },
+        "user": { "type": "keyword" },
+        "ssh_event": { "type": "keyword" },
+        "http_method": { "type": "keyword" },
+        "request_url": { "type": "keyword" },
+        "status_code": { "type": "integer" },
+        "body_bytes_sent": { "type": "integer" },
+        "user_agent": { "type": "text" },
+        "geo": {
+          "properties": {
+            "location": { "type": "geo_point" },
+            "country_name": { "type": "keyword" },
+            "city_name": { "type": "keyword" }
+          }
+        }
+      }
+    }
+  }
+}
